@@ -5,7 +5,7 @@
 
 UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
 	UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor)
-UNITY_INSTANCING_BUFFER_END
+UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
 struct Attributes
 {
@@ -13,16 +13,25 @@ struct Attributes
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
-float4 UnlitPassVertex(Attributes input) : SV_POSITION
+struct Varyings {
+	float4 positionCS : SV_POSITION;
+	UNITY_VERTEX_INPUT_INSTANCE_ID
+};
+
+Varyings UnlitPassVertex(Attributes input)
 {
+	Varyings output;
 	UNITY_SETUP_INSTANCE_ID(input);
+	UNITY_TRANSFER_INSTANCE_ID(input, output);
 	float3 positionWS = TransformObjectToWorld(input.positionOS);
-	return TransformWorldToHClip(positionWS);
+	output.positionCS = TransformWorldToHClip(positionWS);
+	return output;
 }
 
-float4 UnlitPassFragment() : SV_TARGET
+float4 UnlitPassFragment(Varyings input) : SV_TARGET
 {
-	return _BaseColor;
+	UNITY_SETUP_INSTANCE_ID(input);
+	return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
 }
 
 #endif
