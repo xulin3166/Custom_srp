@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CameraRenderer
+public partial class CameraRenderer
 {
     ScriptableRenderContext context;
     Camera camera;
@@ -11,7 +11,6 @@ public class CameraRenderer
     const string bufferName = "Camera Renderer";
     CommandBuffer buffer = new CommandBuffer() { name = bufferName };
     CullingResults cullingResults;
-
     static ShaderTagId unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
 
     public void Render(ScriptableRenderContext context, Camera camera)
@@ -19,35 +18,50 @@ public class CameraRenderer
         this.context = context;
         this.camera = camera;
 
+        PrepareBuffer();
+        PrepareForSceneWindow();
         if (!Cull())
             return;
 
         Setup();
         DrawVisibleGeometry();
+        DrawUnsupportedShaders();
+        DrawGizmos();
         Submit();
     }
 
     void DrawVisibleGeometry() 
     {
-        var sortingSettings = new SortingSettings(camera);
+        var sortingSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortingSettings);
-        var filteringSettings = new FilteringSettings(RenderQueueRange.all);
+        var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
+
         context.DrawSkybox(camera);
+
+        sortingSettings.criteria = SortingCriteria.CommonTransparent;
+        drawingSettings.sortingSettings = sortingSettings;
+        filteringSettings.renderQueueRange = RenderQueueRange.transparent;
+
+        context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
     }
 
     void Submit()
     {
-        buffer.EndSample(bufferName);
+        buffer.EndSample(sampleName);
         ExecuteBuffer();
         context.Submit();
     }
 
     void Setup() {
         context.SetupCameraProperties(camera);
-
-        buffer.ClearRenderTarget(true, true, Color.clear);
-        buffer.BeginSample(bufferName);   
+        CameraClearFlags flags = camera.clearFlags;
+        buffer.ClearRenderTarget(
+            flags <= CameraClearFlags.Depth,
+            flags == CameraClearFlags.Color,
+            flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear
+        );
+        buffer.BeginSample(sampleName);   
         ExecuteBuffer();
     }
 
@@ -66,4 +80,12 @@ public class CameraRenderer
         }
         return false;
     }
+
+    partial void DrawUnsupportedShaders();
+
+    partial void DrawGizmos();
+
+    partial void PrepareForSceneWindow();
+
+    partial void PrepareBuffer();
 }
