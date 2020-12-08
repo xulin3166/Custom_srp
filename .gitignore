@@ -5,4 +5,5 @@ Temp/*
 UserSettings/*
 Custom_srp.sln
 Assembly-CSharp.csproj
-.vs/Custom_srp/v16/.suo
+.vs/*
+.vsconfig
