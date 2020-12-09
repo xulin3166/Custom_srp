@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 6117882670905366240}
   - component: {fileID: 9222078502982543496}
   - component: {fileID: 4696727592704953359}
+  - component: {fileID: -288108197884185683}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Sphere_blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,3 +96,17 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-288108197884185683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301026706158872547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edfe25823a3d0ca4f84c70b7b61e4f7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseColor: {r: 0.5377358, g: 0.120060466, b: 0.120060466, a: 1}
+  cutoff: 0.349

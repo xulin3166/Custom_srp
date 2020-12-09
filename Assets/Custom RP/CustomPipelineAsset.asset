@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CustomPipelineAsset
   m_EditorClassIdentifier: 
   useDynamicBatching: 0
-  useGPUInstancing: 0
-  useSRPBatching: 0
+  useGPUInstancing: 1
+  useSRPBatching: 1
