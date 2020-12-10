@@ -26,8 +26,8 @@ public partial class CameraRenderer
         if (!Cull())
             return;
 
-        Setup();
-        lighting.Setup(context);
+        Setup(context);
+        lighting.Setup(context, cullingResults);
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);
         DrawUnsupportedShaders();
         DrawGizmos();
@@ -61,7 +61,8 @@ public partial class CameraRenderer
         context.Submit();
     }
 
-    void Setup() {
+    void Setup(ScriptableRenderContext context) 
+    {
         context.SetupCameraProperties(camera);
         CameraClearFlags flags = camera.clearFlags;
         buffer.ClearRenderTarget(
@@ -69,7 +70,7 @@ public partial class CameraRenderer
             flags == CameraClearFlags.Color,
             flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear
         );
-        buffer.BeginSample(sampleName);   
+        buffer.BeginSample(sampleName); 
         ExecuteBuffer();
     }
 
