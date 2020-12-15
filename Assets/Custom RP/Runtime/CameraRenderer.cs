@@ -30,8 +30,11 @@ public partial class CameraRenderer
         if (!Cull(shadowSettings.maxDistance))
             return;
 
-        Setup(context);
+        buffer.BeginSample(sampleName);
+        ExecuteBuffer();
         lighting.Setup(context, cullingResults, shadowSettings);
+        buffer.EndSample(sampleName);
+        Setup(context); 
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);
         DrawUnsupportedShaders();
         DrawGizmos();
