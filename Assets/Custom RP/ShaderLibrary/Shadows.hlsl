@@ -20,6 +20,13 @@ struct DirectionalShadowData
 {
 	float strength;
 	int tileIndex;
+	float normalBias;
+};
+
+struct ShadowData
+{
+	int cascadeIndex;
+	float strength;
 };
 
 float SampleDirectionalShadowAtlas(float3 positionSTS)
@@ -27,21 +34,16 @@ float SampleDirectionalShadowAtlas(float3 positionSTS)
 	return SAMPLE_TEXTURE2D_SHADOW(_DirectionalShadowAtlas, SHADOW_SAMPLER, positionSTS);
 }
 
-float GetDirectionalShadowAttenuation(DirectionalShadowData data, Surface surfaceWS)
+float GetDirectionalShadowAttenuation(DirectionalShadowData directional, ShadowData global, Surface surfaceWS)
 {
-	if (data.strength <= 0.0)
+	if (directional.strength <= 0.0)
 		return 1.0f;
-
-	float3 positionSTS = mul(_DirectionalShadowMatrices[data.tileIndex], float4(surfaceWS.position, 1.0)).xyz; 
+	float3 normalBias = surfaceWS.normal * (directional.normalBias * _CascadeData[global.cascadeIndex].y);
+	float3 positionSTS = mul(_DirectionalShadowMatrices[directional.tileIndex], float4(surfaceWS.position + normalBias, 1.0)).xyz;
 	float shadow = SampleDirectionalShadowAtlas(positionSTS);
-	return lerp(1.0, shadow, data.strength);
+	return lerp(1.0, shadow, directional.strength);
 }
 
-struct ShadowData
-{
-	int cascadeIndex;
-	float strength;
-};
 
 float FadeShadowStrength(float distance, float scale, float fade) 
 {

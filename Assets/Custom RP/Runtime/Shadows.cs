@@ -29,6 +29,8 @@ public class Shadows
     struct ShadowedDirectionalLight
     {
         public int visibleLightIndex;
+        public float slopeScaleBias;
+        public float nearPlaneOffset;
     }
 
     ShadowedDirectionalLight[] shadowedDirectionalLights = new ShadowedDirectionalLight[maxShadowDirectionalLightCount];
@@ -52,7 +54,7 @@ public class Shadows
         buffer.Clear();
     }
 
-    public Vector2 ReserveDirectionalShadows(Light light, int visibleLightIndex)
+    public Vector3 ReserveDirectionalShadows(Light light, int visibleLightIndex)
     {
         if (shadowedDirectionalLightCount < maxShadowDirectionalLightCount
             && light.shadows != LightShadows.None
@@ -60,11 +62,16 @@ public class Shadows
             && cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
         {
             shadowedDirectionalLights[shadowedDirectionalLightCount] =
-                new ShadowedDirectionalLight { visibleLightIndex = visibleLightIndex};
-            return new Vector2(light.shadowStrength,
-                settings.directional.cascadeCount * shadowedDirectionalLightCount++);
+                new ShadowedDirectionalLight { 
+                    visibleLightIndex = visibleLightIndex,
+                    slopeScaleBias = light.shadowBias,
+                    nearPlaneOffset = light.shadowNearPlane,
+                };
+            return new Vector3(light.shadowStrength,
+                settings.directional.cascadeCount * shadowedDirectionalLightCount++,
+                light.shadowNormalBias);
         }
-        return Vector2.zero;
+        return Vector3.zero;
     }
 
     public void Render()
@@ -123,7 +130,7 @@ public class Shadows
                 cascadeCount,
                 ratios,
                 tileSize,
-                0f,
+                light.nearPlaneOffset,
                 out Matrix4x4 viewMatrix,
                 out Matrix4x4 projectionMatrix,
                 out ShadowSplitData splitData);
@@ -139,16 +146,18 @@ public class Shadows
                 , split);
             buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
 
-            //buffer.SetGlobalDepthBias(0f, 3f);
+            buffer.SetGlobalDepthBias(0f, light.slopeScaleBias);
             ExecuteBuffer();
             context.DrawShadows(ref shadowSettings);
-            //buffer.SetGlobalDepthBias(0f, 0f);
+            buffer.SetGlobalDepthBias(0f, 0f);
         }
     }
 
     void SetCascadeData(int index, Vector4 cullingSphere, float titleSize)
     {
-        cascadeData[index].x = 1f / cullingSphere.w;
+        
+        float texelSize = 2f * cullingSphere.w / titleSize;
+        cascadeData[index] = new Vector4(1f / cullingSphere.w, texelSize * 1.4142136f);
         cullingSphere.w *= cullingSphere.w;
         cascadeCullingSpheres[index] = cullingSphere;
     }
