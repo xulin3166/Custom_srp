@@ -9,7 +9,19 @@ public class Shadows
     static int cascadeCountId = Shader.PropertyToID("_CascadeCount");
     static int cascadeCullingSpheresId = Shader.PropertyToID("_CascadeCullingSpheres");
     static int cascadeDataId = Shader.PropertyToID("_CascadeData");
+    static int shadowAtlasSizeId = Shader.PropertyToID("_ShadowAtlasSize");
     static int shadowDistanceFadeId = Shader.PropertyToID("_ShadowDistanceFade");
+
+    static string[] directionalFilterKeywords = { 
+        "_DIRECTIONAL_PCF3",
+        "_DIRECTIONAL_PCF5",
+        "_DIRECTIONAL_PCF7",
+    };
+
+    static string[] CascadeBlendKeywords = { 
+        "_CASCADE_BLEND_SOFT",
+        "_CASCADE_BLEND_DITHER"
+    };
 
     static Matrix4x4[] dirShadowMatrices = new Matrix4x4[maxShadowDirectionalLightCount * maxCascade];
     static Vector4[] cascadeCullingSpheres = new Vector4[maxCascade];
@@ -110,6 +122,9 @@ public class Shadows
         float f = 1f - settings.directional.cascadeFade;
         buffer.SetGlobalVector(shadowDistanceFadeId
             , new Vector4(1f / settings.maxDistance, 1f / settings.distanceFade, 1f / (1f - f * f)) );
+        SetKeywords(directionalFilterKeywords, (int)settings.directional.filter - 1);
+        SetKeywords(CascadeBlendKeywords, (int)settings.directional.cascadeBlend - 1);
+        buffer.SetGlobalVector(shadowAtlasSizeId, new Vector4(atlasSize, 1f / atlasSize));
         buffer.EndSample(bufferName);
         ExecuteBuffer();
     }
@@ -121,6 +136,8 @@ public class Shadows
         int cascadeCount = settings.directional.cascadeCount;
         int tileOffset = index * cascadeCount;
         Vector3 ratios = settings.directional.CascadeRatios;
+
+        float cullingFactor = Mathf.Max(0f, 0.8f - settings.directional.cascadeFade);
 
         for (int i = 0; i < cascadeCount; i++)
         {
@@ -134,6 +151,7 @@ public class Shadows
                 out Matrix4x4 viewMatrix,
                 out Matrix4x4 projectionMatrix,
                 out ShadowSplitData splitData);
+            splitData.shadowCascadeBlendCullingFactor = cullingFactor;
             shadowSettings.splitData = splitData;
             if (index == 0)
             {
@@ -153,11 +171,23 @@ public class Shadows
         }
     }
 
+    void SetKeywords(string[] keywords, int enableIndex) 
+    {
+        for (int i = 0; i < keywords.Length; ++i)
+        {
+            if (i == enableIndex)
+                buffer.EnableShaderKeyword(keywords[i]);
+            else
+                buffer.DisableShaderKeyword(keywords[i]);
+        }
+    }
+
     void SetCascadeData(int index, Vector4 cullingSphere, float titleSize)
     {
-        
         float texelSize = 2f * cullingSphere.w / titleSize;
-        cascadeData[index] = new Vector4(1f / cullingSphere.w, texelSize * 1.4142136f);
+        float filterSize = texelSize * ((float)settings.directional.filter + 1f);
+        cascadeData[index] = new Vector4(1f / cullingSphere.w, filterSize * 1.4142136f);
+        cullingSphere.w -= filterSize;
         cullingSphere.w *= cullingSphere.w;
         cascadeCullingSpheres[index] = cullingSphere;
     }
