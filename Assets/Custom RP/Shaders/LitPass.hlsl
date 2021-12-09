@@ -83,10 +83,10 @@ float4 LitPassFragment(Varyings input) : SV_TARGET
 	//base.rgb = abs(length(input.normalWS) - 1.0) * 10;
 	//base.rgb = normalize(input.normalWS);
 	//return base;
+
 	GI gi = GetGI(GI_FRAGMENT_DATA(input), surface);
 	float3 color = GetLighting(surface, brdf, gi);
 	return float4(color, surface.alpha);
-	
 }
 
 #endif
