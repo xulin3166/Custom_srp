@@ -10,7 +10,7 @@ Material:
   m_Name: Lit_Blue
   m_Shader: {fileID: 4800000, guid: 335d9d17cd8bfc84e866281df7cc7975, type: 3}
   m_ShaderKeywords: _RECEIVE_SHADOWS _SHADOWS_ON
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -84,5 +84,5 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.43464455, g: 0.8584906, b: 0.43464455, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0.6486768, g: 1.4595228, b: 0.135141, a: 1}
   m_BuildTextureStacks: []
