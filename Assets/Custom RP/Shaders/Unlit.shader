@@ -9,6 +9,9 @@
 		[Enum(Off, 0, On, 1)] _ZWrite("Z Write", float) = 1
 		[Toggle(_CLIPPING)] _Clipping ("Alpha Clipping", float) = 0
 		[KeywordEnum(On, Clip, Dither, Off)] _Shadows("Shadows", Float) = 0
+
+		[HideInInspector] _MainTex("Texture for Lightmap", 2D) = "white" {}
+		[HideInInspector] _Color("Color for Lightmap", Color) = (0.5, 0.5, 0.5, 1.0
 	}
 
 	SubShader{

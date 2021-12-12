@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MeshBall : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class MeshBall : MonoBehaviour
     [SerializeField]
     Material material = default;
 
+    [SerializeField]
+    LightProbeProxyVolume lightProbeVolume = null;
+
     Matrix4x4[] matrices = new Matrix4x4[1023];
     Vector4[] baseColors = new Vector4[1023];
 
@@ -26,7 +30,7 @@ public class MeshBall : MonoBehaviour
     {
         for (int i = 0; i < matrices.Length; ++i)
         {
-            matrices[i] = Matrix4x4.TRS(Random.insideUnitSphere * 10f, Quaternion.identity, Vector3.one);
+            matrices[i] = Matrix4x4.TRS(transform.position + Random.insideUnitSphere * 10f, Quaternion.identity, Vector3.one);
             baseColors[i] = new Vector4(Random.value, Random.value, Random.value, Random.value);
             metallic[i] = Random.value < 0.25f ? 1f : 0f;
             smoothness[i] = Random.Range(0.05f, 0.95f);
@@ -42,7 +46,23 @@ public class MeshBall : MonoBehaviour
             block.SetVectorArray(baseColorId, baseColors);
             block.SetFloatArray(metallicId, metallic) ;
             block.SetFloatArray(smoothnessId, smoothness);
+
+            if (lightProbeVolume != null)
+            {
+                var positions = new Vector3[1023];
+                for (int i = 0; i < matrices.Length; ++i)
+                {
+                    positions[i] = matrices[i].GetColumn(3);
+                }
+
+                var lightProbes = new SphericalHarmonicsL2[1023];
+                LightProbes.CalculateInterpolatedLightAndOcclusionProbes(positions, lightProbes, null);
+                block.CopySHCoefficientArraysFrom(lightProbes);
+            }
         }
-        Graphics.DrawMeshInstanced(mesh, 0, material, matrices, 1023, block);
+        Graphics.DrawMeshInstanced(mesh, 0, material, matrices, 1023, block,
+            ShadowCastingMode.On, true, 0, null,
+            lightProbeVolume != null ? LightProbeUsage.UseProxyVolume : LightProbeUsage.CustomProvided,
+            lightProbeVolume);
     }
 }
