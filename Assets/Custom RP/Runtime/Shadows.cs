@@ -23,7 +23,8 @@ public class Shadows
         "_CASCADE_BLEND_DITHER"
     };
 
-    static string[] shadowMaskKeywords = { 
+    static string[] shadowMaskKeywords = {
+        "_SHADOW_MASK_ALWAYS",
         "_SHADOW_MASK_DISTANCE",
     };
 
@@ -79,13 +80,19 @@ public class Shadows
         if (shadowedDirectionalLightCount < maxShadowDirectionalLightCount
             && light.shadows != LightShadows.None
             && light.shadowStrength > 0f
-            && cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
+            //&& cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b)
+        )
         {
             LightBakingOutput lightBaking = light.bakingOutput;
             if (lightBaking.lightmapBakeType == LightmapBakeType.Mixed &&
                 lightBaking.mixedLightingMode == MixedLightingMode.Shadowmask)
             {
                 useShadowMask = true;
+            }
+
+            if (cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
+            {
+                return new Vector3(-light.shadowStrength, 0f, 0f);
             }
 
             shadowedDirectionalLights[shadowedDirectionalLightCount] =
@@ -113,7 +120,8 @@ public class Shadows
         }
 
         buffer.BeginSample(bufferName);
-        SetKeywords(shadowMaskKeywords, useShadowMask ? 0 : -1);
+        SetKeywords(shadowMaskKeywords, useShadowMask ? 
+            QualitySettings.shadowmaskMode == ShadowmaskMode.Shadowmask ? 0 : 1 : -1);
         buffer.EndSample(bufferName);
         ExecuteBuffer();
     }
