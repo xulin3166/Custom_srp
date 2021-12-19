@@ -92,7 +92,7 @@ public class Shadows
                 maskChannel = lightBaking.occlusionMaskChannel;
             }
 
-            if (cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
+            if (!cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
             {
                 return new Vector4(-light.shadowStrength, 0f, 0f, maskChannel);
             }
