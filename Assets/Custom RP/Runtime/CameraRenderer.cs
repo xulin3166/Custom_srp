@@ -48,12 +48,14 @@ public partial class CameraRenderer
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortingSettings) {
             enableDynamicBatching = useDynamicBatching,
             enableInstancing = useGPUInstancing,
-            perObjectData = PerObjectData.Lightmaps | 
-            PerObjectData.LightProbe | 
-            PerObjectData.OcclusionProbe |
-            PerObjectData.LightProbeProxyVolume |
-            PerObjectData.OcclusionProbeProxyVolume |
-            PerObjectData.ShadowMask
+            perObjectData = 
+                PerObjectData.ReflectionProbes |
+                PerObjectData.Lightmaps | 
+                PerObjectData.LightProbe | 
+                PerObjectData.OcclusionProbe |
+                PerObjectData.LightProbeProxyVolume |
+                PerObjectData.OcclusionProbeProxyVolume |
+                PerObjectData.ShadowMask
         };
         drawingSettings.SetShaderPassName(1, litShaderTagId);
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
