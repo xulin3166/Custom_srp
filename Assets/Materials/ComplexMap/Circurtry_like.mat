@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Circurtry_like
   m_Shader: {fileID: 4800000, guid: 335d9d17cd8bfc84e866281df7cc7975, type: 3}
-  m_ShaderKeywords: _RECEIVE_SHADOWS _SHADOWS_ON
+  m_ShaderKeywords: _DETAIL_MAP _MASK_MAP _NORMAL_MAP _RECEIVE_SHADOWS _SHADOWS_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -33,14 +33,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _DetailMap:
         m_Texture: {fileID: 2800000, guid: cb94a2fad55ee1c45870bebc8d8a36b7, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 5, y: 5}
         m_Offset: {x: 0, y: 0}
     - _DetailMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailNormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 4623c856c1c082243a6051ed8e0ed3a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -59,6 +59,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: f81c9141bae5b8a41b37ed80d3b35f66, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -70,15 +74,22 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Clipping: 0
-    - _Cutoff: 0.5
+    - _Cutoff: 0.563
+    - _DetailAlbedo: 0.153
+    - _DetailMapToggle: 1
     - _DetailNormalMapScale: 1
+    - _DetailNormalScale: 1
+    - _DetailSmoothness: 0.51
     - _DstBlend: 0
     - _Fresnel: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _MaskMapToggle: 1
     - _Metallic: 0.979
     - _Mode: 0
+    - _NormalMapToggle: 1
+    - _NormalScale: 1
     - _Occlusion: 0.049
     - _OcclusionStrength: 1
     - _Parallax: 0.02
