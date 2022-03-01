@@ -20,6 +20,7 @@ public partial class CameraRenderer
         , Camera camera
         , bool useDynamicBatching
         , bool useGPUInstancing
+        , bool useLightsPerObject
         , ShadowSettings shadowSettings)
     {
         this.context = context;
@@ -32,18 +33,22 @@ public partial class CameraRenderer
 
         buffer.BeginSample(sampleName);
         ExecuteBuffer();
-        lighting.Setup(context, cullingResults, shadowSettings);
+        lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject);
         buffer.EndSample(sampleName);
         Setup(context); 
-        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);
+        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject);
         DrawUnsupportedShaders();
         DrawGizmos();
         lighting.Cleanup();
         Submit();
     }
 
-    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing) 
+    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject) 
     {
+        PerObjectData lightsPerObjectFlags = useLightsPerObject ?
+            PerObjectData.LightData | PerObjectData.LightIndices :
+            PerObjectData.None;
+
         var sortingSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortingSettings) {
             enableDynamicBatching = useDynamicBatching,
@@ -55,7 +60,8 @@ public partial class CameraRenderer
                 PerObjectData.OcclusionProbe |
                 PerObjectData.LightProbeProxyVolume |
                 PerObjectData.OcclusionProbeProxyVolume |
-                PerObjectData.ShadowMask
+                PerObjectData.ShadowMask |
+                lightsPerObjectFlags
         };
         drawingSettings.SetShaderPassName(1, litShaderTagId);
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
